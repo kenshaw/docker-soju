@@ -2,8 +2,8 @@
 # The packages are not pinned: the image is rebuilt every day (see systemd/), so it follows Alpine edge.
 FROM docker.io/library/alpine:edge
 
-# soju also ships `sojuctl`, which talks to the admin socket. yq reads the YAML files of a reconcile step.
-RUN apk add --no-cache soju yq-go ca-certificates tzdata \
+# soju also ships `sojuctl`, which talks to the admin socket. yq and psql are for the reconcile step in the cluster (xoxo-infra, clusters/apps/manifests/soju/reconcile.sh).
+RUN apk add --no-cache soju yq-go postgresql-client ca-certificates tzdata \
  && (deluser soju; delgroup soju; true) \
  && addgroup -g 10001 soju \
  && adduser -D -H -u 10001 -G soju soju \
