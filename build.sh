@@ -4,7 +4,8 @@
 # `./build.sh --no-push` builds only.
 set -euo pipefail
 
-cd "$(dirname "$0")"
+SRC="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SRC"
 
 image="${IMAGE:-docker.io/kenshaw/soju}"
 push=1

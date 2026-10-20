@@ -2,12 +2,14 @@
 # Installs the systemd user units and starts the daily timer.
 set -euo pipefail
 
-cd "$(dirname "$0")"
+SRC="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SRC"
 
-mkdir -p ~/.config/systemd/user
-for unit in soju-image.service soju-image.timer; do
-  ln -sf "$PWD/systemd/$unit" ~/.config/systemd/user/"$unit"
-done
+unitdir="${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user"
+mkdir -p "$unitdir"
+# The service is written with the real directory of this repository (a symlink could not hold it); the timer is the same everywhere.
+sed "s|@SRC@|$SRC|g" systemd/soju-image.service > "$unitdir/soju-image.service"
+ln -sf "$SRC/systemd/soju-image.timer" "$unitdir/soju-image.timer"
 
 systemctl --user daemon-reload
 systemctl --user enable --now soju-image.timer

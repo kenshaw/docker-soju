@@ -5,7 +5,7 @@ After=network-online.target
 
 [Service]
 Type=oneshot
-# %h is the home directory of the user.
-WorkingDirectory=%h/src/kenshaw/soju
-ExecStart=%h/src/kenshaw/soju/build.sh
+# install.sh replaces @SRC@ with the directory of this repository, so the unit works wherever the repository is cloned.
+WorkingDirectory=@SRC@
+ExecStart=@SRC@/build.sh
 TimeoutStartSec=30min
