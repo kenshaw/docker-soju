@@ -1,5 +1,6 @@
-# soju, the IRC bouncer, on Alpine. The packages are not pinned: the image is rebuilt every day (see systemd/), so it follows Alpine.
-FROM docker.io/library/alpine:latest
+# soju, the IRC bouncer, on Alpine edge: the stable releases of Alpine have soju 0.10.1, and edge has 0.11.x (the version on the old server z01).
+# The packages are not pinned: the image is rebuilt every day (see systemd/), so it follows Alpine edge.
+FROM docker.io/library/alpine:edge
 
 # soju also ships `sojuctl`, which talks to the admin socket. yq reads the YAML files of a reconcile step.
 RUN apk add --no-cache soju yq-go ca-certificates tzdata \
