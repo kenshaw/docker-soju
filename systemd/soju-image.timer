@@ -1,0 +1,11 @@
+[Unit]
+Description=Build the soju container image every day
+
+[Timer]
+OnCalendar=*-*-* 04:00:00
+# Run at the next start when the machine was off at 04:00.
+Persistent=true
+RandomizedDelaySec=15min
+
+[Install]
+WantedBy=timers.target

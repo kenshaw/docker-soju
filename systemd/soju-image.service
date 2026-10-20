@@ -1,0 +1,11 @@
+[Unit]
+Description=Build and push the soju container image
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+# %h is the home directory of the user.
+WorkingDirectory=%h/src/kenshaw/soju
+ExecStart=%h/src/kenshaw/soju/build.sh
+TimeoutStartSec=30min
