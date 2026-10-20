@@ -20,7 +20,10 @@ fi
 buildah build --platform linux/amd64 --pull=newer --no-cache --tag "$image:latest" .
 
 # soju has no -version flag, so ask the package manager: `apk list --installed soju` prints "soju-0.10.1-r8 x86_64 {soju} ...".
-version="$(podman run --rm --platform linux/amd64 --entrypoint apk "$image:latest" list --installed soju | awk 'NR == 1 {print $1}')"
+# Use buildah with --pull=never: `podman run` did not find the new image in its storage, pulled the OLD :latest from Docker Hub, and the script then pushed it again.
+ctr="$(buildah from --pull=never --platform linux/amd64 "$image:latest")"
+trap 'buildah rm "$ctr" >/dev/null 2>&1 || true' EXIT
+version="$(buildah run "$ctr" -- apk list --installed soju | awk 'NR == 1 {print $1}')"
 version="${version#soju-}"
 if ! [[ "$version" =~ ^[0-9][0-9A-Za-z._-]*$ ]]; then
   echo "could not read the soju version, got: $version" >&2
