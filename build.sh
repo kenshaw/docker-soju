@@ -25,6 +25,8 @@ ctr="$(buildah from --pull=never --platform linux/amd64 "$image:latest")"
 trap 'buildah rm "$ctr" >/dev/null 2>&1 || true' EXIT
 version="$(buildah run "$ctr" -- apk list --installed soju | awk 'NR == 1 {print $1}')"
 version="${version#soju-}"
+# The container is not needed any more, and an image that a container uses cannot be removed in the clean up below.
+buildah rm "$ctr" >/dev/null
 if ! [[ "$version" =~ ^[0-9][0-9A-Za-z._-]*$ ]]; then
   echo "could not read the soju version, got: $version" >&2
   exit 1
@@ -39,3 +41,13 @@ if [ "$push" = 1 ]; then
     buildah push "$image:$tag"
   done
 fi
+
+# Clean up (only reached when the build and the push worked, so a failed push keeps the images for the next try): remove the old tags of this
+# image on this machine, keeping latest, the current version and today's date, and then every image that no tag points to (the old builds, and the old Alpine base).
+buildah images --noheading --format '{{.Name}}:{{.Tag}}' | grep -F -- "$image:" | while read -r ref; do
+  case "${ref#"$image:"}" in
+    latest | "$version" | "$date") ;;
+    *) echo "removing $ref"; buildah rmi "$ref" || true ;;
+  esac
+done
+buildah rmi --prune || true
