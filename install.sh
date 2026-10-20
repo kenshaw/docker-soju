@@ -8,6 +8,9 @@ cd "$SRC"
 unitdir="${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user"
 mkdir -p "$unitdir"
 # The service is written with the real directory of this repository (a symlink could not hold it); the timer is the same everywhere.
+# Remove the old file first: the first version of this script made a symlink here, and writing through it would overwrite the template in the repository
+# (or a symlink to /dev/null, which is what a masked unit is).
+rm -f "$unitdir/soju-image.service"
 sed "s|@SRC@|$SRC|g" systemd/soju-image.service > "$unitdir/soju-image.service"
 ln -sf "$SRC/systemd/soju-image.timer" "$unitdir/soju-image.timer"
 
